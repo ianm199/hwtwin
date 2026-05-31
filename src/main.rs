@@ -29,6 +29,34 @@ use sensors::{AppleSmc, SensorSource};
 
 const TWIN_HTML: &str = include_str!("twin.html");
 
+/// Reads this machine's model identifier (e.g. `Mac15,11`) from sysctl.
+fn detect_model() -> String {
+    std::process::Command::new("sysctl")
+        .args(["-n", "hw.model"])
+        .output()
+        .ok()
+        .and_then(|o| String::from_utf8(o.stdout).ok())
+        .map(|s| s.trim().to_string())
+        .unwrap_or_default()
+}
+
+/// Loads the sensor profile for the running machine, or exits with guidance if
+/// this model has not been mapped yet.
+fn load_profile() -> Profile {
+    let model = detect_model();
+    match Profile::for_model(&model) {
+        Some(p) => p,
+        None => {
+            eprintln!(
+                "No sensor profile for model '{model}'.\nBundled models: {:?}.\n\
+                 Drop a profiles/{model}.profile file, or run the mapping harness to create one.",
+                Profile::bundled_models()
+            );
+            std::process::exit(1);
+        }
+    }
+}
+
 fn main() {
     let src = match AppleSmc::open() {
         Ok(s) => s,
@@ -37,7 +65,9 @@ fn main() {
             std::process::exit(1);
         }
     };
-    let profile = Profile::m3_max();
+    let profile = load_profile();
+    eprintln!("hwtwin · model {} · {} rails, {} P-core sensors mapped",
+        profile.model, profile.rails.len(), profile.cpu_p_temp.len());
 
     match std::env::args().nth(1).as_deref() {
         Some("serve") => serve(),
@@ -87,7 +117,7 @@ fn handle_conn(mut stream: TcpStream) {
             Ok(s) => s,
             Err(_) => return,
         };
-        let profile = Profile::m3_max();
+        let profile = load_profile();
         loop {
             let msg = format!("data: {}\n\n", Snapshot::build(&src, &profile).to_json());
             if stream.write_all(msg.as_bytes()).is_err() || stream.flush().is_err() {

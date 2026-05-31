@@ -1,82 +1,86 @@
 //! The semantic map: which raw sensor keys correspond to which logical
-//! subsystem on a given machine.
+//! subsystem, **as data keyed by machine model**.
 //!
-//! This is the chip-specific layer. A `Profile` is data, not logic — the same
-//! `model`/UI code renders any machine for which a profile exists. The Apple M3
-//! Max profile below is the output of our stimulus-correlation mapping; a new
-//! chip (M4, or a non-Mac via another backend) is a new `Profile`, not new code.
+//! A `Profile` is loaded for the running machine's `hw.model`. Profiles live as
+//! plain text files (`profiles/<model>.profile`) so adding a new Mac is dropping
+//! in a file — no recompile. Known profiles are also embedded in the binary so
+//! it runs standalone. New Macs get a profile from the mapping harness.
 //!
 //! Labels are empirical/correlational, not vendor ground truth.
 
+use std::collections::HashMap;
+use std::fs;
+
 /// Maps a machine's raw sensor keys onto logical subsystems.
 pub struct Profile {
-    /// Per-sensor P-core temperatures (also the P-cluster heatmap grid).
-    pub cpu_p_temp: &'static [&'static str],
-    /// Per-sensor E-core temperatures.
-    pub cpu_e_temp: &'static [&'static str],
-    /// Per-sensor GPU temperatures.
-    pub gpu_temp: &'static [&'static str],
-    /// Die hotspot sensors (reduced by max, not average).
-    pub hotspot: &'static [&'static str],
-    pub dram_temp: &'static [&'static str],
-    pub dram_power: &'static str,
-    pub ssd_temp: &'static [&'static str],
-    pub battery_temp: &'static [&'static str],
-    /// Fan tachometers (actual RPM), in order.
-    pub fans: &'static [&'static str],
-    /// System total power rail.
-    pub system_power: &'static str,
-    /// CPU cluster power rails; summed for CPU power, also reported individually.
-    pub cpu_clusters: &'static [&'static str],
-    /// Rail suffixes that expose `V<suffix>`, `I<suffix>`, `P<suffix>` together.
-    pub rails: &'static [&'static str],
+    pub model: String,
+    pub cpu_p_temp: Vec<String>,
+    pub cpu_e_temp: Vec<String>,
+    pub gpu_temp: Vec<String>,
+    pub hotspot: Vec<String>,
+    pub dram_temp: Vec<String>,
+    pub dram_power: String,
+    pub ssd_temp: Vec<String>,
+    pub battery_temp: Vec<String>,
+    pub fans: Vec<String>,
+    pub system_power: String,
+    pub cpu_clusters: Vec<String>,
+    pub rails: Vec<String>,
 }
 
+/// Profiles shipped inside the binary, keyed by `hw.model`.
+const BUNDLED: &[(&str, &str)] = &[("Mac15,11", include_str!("../profiles/Mac15,11.profile"))];
+
 impl Profile {
-    /// The Apple M3 Max (`Mac15,11`) profile, from the mapping run.
-    pub fn m3_max() -> Self {
-        Self {
-            cpu_p_temp: M3_P_KEYS,
-            cpu_e_temp: M3_E_KEYS,
-            gpu_temp: M3_G_KEYS,
-            hotspot: &["TCMb", "TCMz"],
-            dram_temp: &["TRD0", "TRD1", "TRD3", "TRD4", "TRD8", "TRDb"],
-            dram_power: "PMVC",
-            ssd_temp: &["TH0a", "TH0b", "TH0x"],
-            battery_temp: &["TB0T", "TB1T", "TB2T"],
-            fans: &["F0Ac", "F1Ac"],
-            system_power: "PSTR",
-            cpu_clusters: &["PZC0", "PZC1"],
-            rails: M3_RAILS,
+    /// Loads the profile for a machine model: a `profiles/<model>.profile` file
+    /// on disk if present (lets new models ship without a recompile), otherwise
+    /// a profile bundled into the binary. `None` if the model is unmapped.
+    pub fn for_model(model: &str) -> Option<Profile> {
+        if let Ok(text) = fs::read_to_string(format!("profiles/{model}.profile")) {
+            return Some(Profile::parse(&text));
+        }
+        BUNDLED
+            .iter()
+            .find(|(m, _)| *m == model)
+            .map(|(_, text)| Profile::parse(text))
+    }
+
+    /// Models this binary ships a profile for.
+    pub fn bundled_models() -> Vec<&'static str> {
+        BUNDLED.iter().map(|(m, _)| *m).collect()
+    }
+
+    /// Parses the `field: key key key` profile format.
+    fn parse(text: &str) -> Profile {
+        let mut fields: HashMap<String, Vec<String>> = HashMap::new();
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            if let Some((key, value)) = line.split_once(':') {
+                fields.insert(
+                    key.trim().to_string(),
+                    value.split_whitespace().map(|s| s.to_string()).collect(),
+                );
+            }
+        }
+        let list = |k: &str| fields.get(k).cloned().unwrap_or_default();
+        let one = |k: &str| fields.get(k).and_then(|v| v.first().cloned()).unwrap_or_default();
+        Profile {
+            model: one("model"),
+            cpu_p_temp: list("cpu_p_temp"),
+            cpu_e_temp: list("cpu_e_temp"),
+            gpu_temp: list("gpu_temp"),
+            hotspot: list("hotspot"),
+            dram_temp: list("dram_temp"),
+            dram_power: one("dram_power"),
+            ssd_temp: list("ssd_temp"),
+            battery_temp: list("battery_temp"),
+            fans: list("fans"),
+            system_power: one("system_power"),
+            cpu_clusters: list("cpu_clusters"),
+            rails: list("rails"),
         }
     }
 }
-
-const M3_P_KEYS: &[&str] = &[
-    "Tp04", "Tp05", "Tp06", "Tp0C", "Tp0D", "Tp0E", "Tp0K", "Tp0L", "Tp0M", "Tp0R", "Tp0S",
-    "Tp0T", "Tp0U", "Tp0V", "Tp0W", "Tp0a", "Tp0b", "Tp0c", "Tp0g", "Tp0h", "Tp0i", "Tp0m",
-    "Tp0n", "Tp0o", "Tp0u", "Tp0v", "Tp0w", "Tp0y", "Tp0z", "Tp10", "Tp16", "Tp17", "Tp18",
-    "Tp1E", "Tp1F", "Tp1G", "Tp1I", "Tp1J", "Tp1K", "Tp1Q", "Tp1R", "Tp1S", "Tp1g", "Tp1h",
-    "Tp1i", "Tp1o", "Tp1p", "Tp1q", "Tp1x", "Tp1y", "Tp1z", "Tp25", "Tp26", "Tp27", "Tp29",
-    "Tp2A", "Tp2B", "Tp2H", "Tp2I", "Tp2J", "Tp2P", "Tp2Q", "Tp2R", "Tp2X", "Tp2Y", "Tp2Z",
-    "Tp2f", "Tp2g", "Tp2h", "Tp2j", "Tp2k", "Tp2l", "Tp2r", "Tp2s", "Tp2t", "Tp2z", "Tp30",
-    "Tp31", "Tp33", "Tp34", "Tp35", "Tp3B", "Tp3C", "Tp3D", "Tp3O", "Tp3P", "Tp3S", "Tp3T",
-    "Tp3W", "Tp3X", "Tp3a", "Tp3b", "Tp3e", "Tp3f", "Tp3i", "Tp3j",
-];
-
-const M3_E_KEYS: &[&str] = &[
-    "Te04", "Te05", "Te06", "Te0K", "Te0L", "Te0M", "Te0P", "Te0Q", "Te0S", "Te0T",
-];
-
-const M3_G_KEYS: &[&str] = &[
-    "Tg00", "Tg01", "Tg04", "Tg05", "Tg0C", "Tg0D", "Tg0K", "Tg0L", "Tg0y", "Tg0z", "Tg16",
-    "Tg17", "Tg1E", "Tg1F", "Tg1s", "Tg1t", "Tg1x", "Tg1y", "Tg21", "Tg22", "Tg29", "Tg2A",
-    "Tg2H", "Tg2I", "Tg33", "Tg34", "Tg3B", "Tg3C", "Tg3J", "Tg3K", "Tg3x", "Tg3y",
-];
-
-const M3_RAILS: &[&str] = &[
-    "C00", "C01", "C02", "C03", "C10", "C11", "C12", "C13", "C20", "C21", "C22", "C23", "C32",
-    "C40", "C42", "C43", "E0b", "E1b", "P0b", "P1b", "P1l", "P2b", "P2l", "P3b", "P3l", "P4l",
-    "P5b", "P5l", "P6b", "P7b", "P8b", "P9b", "R0b", "R0l", "R1b", "R1l", "R2b", "R3b", "R4b",
-    "R5b", "R6b", "R7b", "R8b", "R9b", "SVR", "b0f",
-];

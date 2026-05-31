@@ -109,12 +109,21 @@ a clean split between the privileged OS-specific *sensor source* and the portabl
    Windows LHM/WMI ◻               + rail P=V×I                     (done)
 ```
 
-Planned: factor sensor reading behind a `SensorSource` trait so the twin and analysis
-become hardware-agnostic, then add Linux (`/sys/class/hwmon`) and Windows
-(LibreHardwareMonitor) backends. The browser UI is already portable; only the data source
-is OS-specific. A WASM build of the *analysis* layer (operating on uploaded
-`samples.jsonl`) is a natural shareable companion — capture stays native, insight goes to
-the web.
+**Done:** sensor reading is behind a `SensorSource` trait (`src/sensors.rs`); the twin and
+analysis consume a hardware-independent `Snapshot` (`src/model.rs`). Sensor maps are
+**data, not code** — `profiles/<hw.model>.profile` text files, auto-detected at runtime
+(disk first, so a new Mac is a dropped-in file with no recompile; known profiles are also
+bundled into the binary). Running on an unmapped model prints guidance to map it.
+
+```
+profiles/
+└── Mac15,11.profile     # Apple M3 Max — the mapping output, as portable data
+```
+
+**Planned:** Linux (`/sys/class/hwmon`) and Windows (LibreHardwareMonitor) `SensorSource`
+backends — the twin, power tree, and analysis won't change. A WASM build of the *analysis*
+layer (operating on an uploaded `samples.jsonl`) is a natural shareable companion: capture
+stays native, insight goes to the web.
 
 ## Honesty
 

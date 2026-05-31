@@ -49,18 +49,18 @@ impl Snapshot {
     /// into logical subsystems.
     pub fn build(src: &dyn SensorSource, p: &Profile) -> Self {
         let mut want: Vec<String> = Vec::new();
-        add(&mut want, p.cpu_p_temp);
-        add(&mut want, p.cpu_e_temp);
-        add(&mut want, p.gpu_temp);
-        add(&mut want, p.hotspot);
-        add(&mut want, p.dram_temp);
-        add(&mut want, p.ssd_temp);
-        add(&mut want, p.battery_temp);
-        add(&mut want, p.fans);
-        add(&mut want, p.cpu_clusters);
-        want.push(p.dram_power.to_string());
-        want.push(p.system_power.to_string());
-        for s in p.rails {
+        add(&mut want, &p.cpu_p_temp);
+        add(&mut want, &p.cpu_e_temp);
+        add(&mut want, &p.gpu_temp);
+        add(&mut want, &p.hotspot);
+        add(&mut want, &p.dram_temp);
+        add(&mut want, &p.ssd_temp);
+        add(&mut want, &p.battery_temp);
+        add(&mut want, &p.fans);
+        add(&mut want, &p.cpu_clusters);
+        want.push(p.dram_power.clone());
+        want.push(p.system_power.clone());
+        for s in &p.rails {
             want.push(format!("V{s}"));
             want.push(format!("I{s}"));
             want.push(format!("P{s}"));
@@ -68,7 +68,7 @@ impl Snapshot {
         let refs: Vec<&str> = want.iter().map(|s| s.as_str()).collect();
         let m = src.read(&refs);
 
-        let clusters: Vec<f32> = p.cpu_clusters.iter().filter_map(|k| m.get(*k).copied()).collect();
+        let clusters: Vec<f32> = p.cpu_clusters.iter().filter_map(|k| m.get(k).copied()).collect();
         let cpu_power = if clusters.is_empty() {
             None
         } else {
@@ -80,7 +80,7 @@ impl Snapshot {
             .iter()
             .filter_map(|s| {
                 m.get(format!("P{s}").as_str()).map(|&p| Rail {
-                    key: (*s).to_string(),
+                    key: s.clone(),
                     v: m.get(format!("V{s}").as_str()).copied(),
                     i: m.get(format!("I{s}").as_str()).copied(),
                     p,
@@ -90,37 +90,37 @@ impl Snapshot {
 
         Snapshot {
             cpu_p: Subsystem {
-                temp: avg(&m, p.cpu_p_temp),
+                temp: avg(&m, &p.cpu_p_temp),
                 power: cpu_power,
             },
             cpu_e: Subsystem {
-                temp: avg(&m, p.cpu_e_temp),
+                temp: avg(&m, &p.cpu_e_temp),
                 power: None,
             },
             gpu: Subsystem {
-                temp: avg(&m, p.gpu_temp),
+                temp: avg(&m, &p.gpu_temp),
                 power: None,
             },
             dram: Subsystem {
-                temp: avg(&m, p.dram_temp),
-                power: m.get(p.dram_power).copied(),
+                temp: avg(&m, &p.dram_temp),
+                power: m.get(&p.dram_power).copied(),
             },
             ssd: Subsystem {
-                temp: avg(&m, p.ssd_temp),
+                temp: avg(&m, &p.ssd_temp),
                 power: None,
             },
             battery: Subsystem {
-                temp: avg(&m, p.battery_temp),
+                temp: avg(&m, &p.battery_temp),
                 power: None,
             },
-            hotspot: maxv(&m, p.hotspot),
-            fans: p.fans.iter().map(|k| m.get(*k).copied()).collect(),
-            total_power: m.get(p.system_power).copied(),
-            cluster0: p.cpu_clusters.first().and_then(|k| m.get(*k).copied()),
-            cluster1: p.cpu_clusters.get(1).and_then(|k| m.get(*k).copied()),
-            grid_p: grid(&m, p.cpu_p_temp),
-            grid_e: grid(&m, p.cpu_e_temp),
-            grid_g: grid(&m, p.gpu_temp),
+            hotspot: maxv(&m, &p.hotspot),
+            fans: p.fans.iter().map(|k| m.get(k).copied()).collect(),
+            total_power: m.get(&p.system_power).copied(),
+            cluster0: p.cpu_clusters.first().and_then(|k| m.get(k).copied()),
+            cluster1: p.cpu_clusters.get(1).and_then(|k| m.get(k).copied()),
+            grid_p: grid(&m, &p.cpu_p_temp),
+            grid_e: grid(&m, &p.cpu_e_temp),
+            grid_g: grid(&m, &p.gpu_temp),
             rails,
         }
     }
@@ -158,14 +158,14 @@ impl Snapshot {
     }
 }
 
-fn add(want: &mut Vec<String>, keys: &[&str]) {
+fn add(want: &mut Vec<String>, keys: &[String]) {
     for k in keys {
-        want.push((*k).to_string());
+        want.push(k.clone());
     }
 }
 
-fn avg(m: &HashMap<String, f32>, keys: &[&str]) -> Option<f32> {
-    let vals: Vec<f32> = keys.iter().filter_map(|k| m.get(*k).copied()).collect();
+fn avg(m: &HashMap<String, f32>, keys: &[String]) -> Option<f32> {
+    let vals: Vec<f32> = keys.iter().filter_map(|k| m.get(k).copied()).collect();
     if vals.is_empty() {
         None
     } else {
@@ -173,15 +173,15 @@ fn avg(m: &HashMap<String, f32>, keys: &[&str]) -> Option<f32> {
     }
 }
 
-fn maxv(m: &HashMap<String, f32>, keys: &[&str]) -> Option<f32> {
+fn maxv(m: &HashMap<String, f32>, keys: &[String]) -> Option<f32> {
     keys.iter()
-        .filter_map(|k| m.get(*k).copied())
+        .filter_map(|k| m.get(k).copied())
         .fold(None, |acc, v| Some(acc.map_or(v, |a: f32| a.max(v))))
 }
 
-fn grid(m: &HashMap<String, f32>, keys: &[&str]) -> Vec<(String, f32)> {
+fn grid(m: &HashMap<String, f32>, keys: &[String]) -> Vec<(String, f32)> {
     keys.iter()
-        .filter_map(|k| m.get(*k).map(|v| ((*k).to_string(), *v)))
+        .filter_map(|k| m.get(k).map(|v| (k.clone(), *v)))
         .collect()
 }
 
