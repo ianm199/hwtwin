@@ -55,6 +55,55 @@ impl Profile {
         BUNDLED.iter().map(|(m, _)| *m).collect()
     }
 
+    /// Builds a best-effort profile for an unmapped machine from the keys it
+    /// actually exposes, using Apple Silicon naming conventions. Lets the twin
+    /// work on any M-series Mac out of the box; running the harness refines it.
+    pub fn generic(schema: &[(String, String)]) -> Profile {
+        let keys: Vec<&str> = schema.iter().map(|(k, _)| k.as_str()).collect();
+        let set: HashMap<&str, ()> = keys.iter().map(|k| (*k, ())).collect();
+        let starts = |p: &str| -> Vec<String> {
+            keys.iter().filter(|k| k.starts_with(p)).map(|k| k.to_string()).collect()
+        };
+        let one = |k: &str| if set.contains_key(k) { k.to_string() } else { String::new() };
+        let mut rails = Vec::new();
+        for k in &keys {
+            if let Some(suffix) = k.strip_prefix('V') {
+                if suffix.len() == 3
+                    && set.contains_key(format!("I{suffix}").as_str())
+                    && set.contains_key(format!("P{suffix}").as_str())
+                {
+                    rails.push(suffix.to_string());
+                }
+            }
+        }
+        Profile {
+            model: "generic".to_string(),
+            cpu_p_temp: starts("Tp"),
+            cpu_e_temp: starts("Te"),
+            gpu_temp: starts("Tg"),
+            hotspot: starts("TCM"),
+            dram_temp: starts("TRD"),
+            dram_power: one("PMVC"),
+            ssd_temp: starts("TH0"),
+            battery_temp: starts("TB"),
+            fans: keys.iter()
+                .filter(|k| k.len() == 4 && k.starts_with('F') && k.ends_with("Ac"))
+                .map(|k| k.to_string())
+                .collect(),
+            system_power: one("PSTR"),
+            cpu_clusters: ["PZC0", "PZC1"].iter()
+                .filter(|k| set.contains_key(**k))
+                .map(|k| k.to_string())
+                .collect(),
+            rails,
+            adapter_voltage: Vec::new(),
+            adapter_current: Vec::new(),
+            backlight_power: one("PDBR"),
+            backlight_current: one("IDBR"),
+            ane_temp: Vec::new(),
+        }
+    }
+
     /// Parses the `field: key key key` profile format.
     fn parse(text: &str) -> Profile {
         let mut fields: HashMap<String, Vec<String>> = HashMap::new();

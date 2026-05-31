@@ -1,6 +1,8 @@
 [package]
-name = "smc_reader"
+name = "smcprobe"
 version = "0.1.0"
 edition = "2024"
+description = "Reverse-engineering Apple Silicon's SMC: map undocumented sensor keys to subsystems by stimulus correlation, with a live twin."
+license = "MIT"
 
 [dependencies]

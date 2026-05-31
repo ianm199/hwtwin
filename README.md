@@ -1,17 +1,24 @@
-# hwtwin — a live hardware digital twin
+# smcprobe — reverse-engineering the Apple Silicon SMC
 
-A self-contained tool that reads a machine's raw sensors and renders a **live digital
-twin** of the silicon — per-core temperature heatmaps, a power-delivery tree, fans,
-battery, and energy — in the browser. Plus a small **reverse-engineering harness** that
-maps undocumented sensors to physical subsystems by correlating them against controlled
-workloads.
+**Apple documents none of the ~2,700 sensor keys in the Mac's System Management Controller.**
+smcprobe maps them: it drives isolated workloads (CPU, GPU, memory, disk, charger, …) and
+watches which undocumented keys respond, turning a black box into a labeled map of every
+temperature, voltage, current, power rail, and fan on the die.
 
-Today it speaks to the **Apple SMC** (System Management Controller) on Apple Silicon via
-IOKit, with no external dependencies. The architecture is built to grow other hardware
-backends (see [Roadmap](#roadmap)).
+The **live digital twin** below is the demo of that map — per-core temperature heatmaps, a
+power-delivery tree that checks `P = V × I`, fans, battery, charger, and energy, streamed in
+the browser:
 
-> Status: working on Apple M3 Max (MacBook Pro, `Mac15,11`). Sensor *labels* are
-> empirical/correlational, not vendor ground truth — see [Honesty](#honesty).
+![smcprobe live twin](docs/twin.png)
+
+It speaks to the **Apple SMC** via IOKit with **no external dependencies**, and a clean
+`SensorSource → Profile → Snapshot` seam built to grow Linux/Windows backends (see
+[Roadmap](#architecture--roadmap)).
+
+> Runs on **any Apple Silicon Mac**: mapped models (currently `Mac15,11`, M3 Max) load a
+> verified profile; others get a generic one from naming conventions and can be mapped with
+> the harness. Sensor *labels* are empirical/correlational, not vendor ground truth — see
+> [Honesty](#honesty).
 
 ---
 

@@ -327,7 +327,7 @@
     setText("status", "● live · streaming from AppleSMC");
     update(JSON.parse(e.data));
   };
-  es.onerror = () => setText("status", "stream lost — is `smc_reader serve` running?");
+  es.onerror = () => setText("status", "stream lost — is `smcprobe serve` running?");
 </script>
 </body>
 </html>

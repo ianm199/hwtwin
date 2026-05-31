@@ -1,4 +1,4 @@
-//! hwtwin — a live hardware digital twin.
+//! smcprobe — reverse-engineer the Apple Silicon SMC; live twin is the demo.
 //!
 //! Reads a machine's raw sensors through a [`sensors::SensorSource`] backend,
 //! maps them to logical subsystems with a [`profile::Profile`], and reduces them
@@ -40,21 +40,20 @@ fn detect_model() -> String {
         .unwrap_or_default()
 }
 
-/// Loads the sensor profile for the running machine, or exits with guidance if
-/// this model has not been mapped yet.
-fn load_profile() -> Profile {
+/// Loads the sensor profile for the running machine. Uses a mapped profile if
+/// one exists for this model, otherwise builds a generic one from the keys the
+/// machine exposes — so the twin works on any Apple Silicon Mac out of the box.
+fn load_profile(src: &dyn SensorSource) -> Profile {
     let model = detect_model();
-    match Profile::for_model(&model) {
-        Some(p) => p,
-        None => {
-            eprintln!(
-                "No sensor profile for model '{model}'.\nBundled models: {:?}.\n\
-                 Drop a profiles/{model}.profile file, or run the mapping harness to create one.",
-                Profile::bundled_models()
-            );
-            std::process::exit(1);
-        }
+    if let Some(p) = Profile::for_model(&model) {
+        return p;
     }
+    eprintln!(
+        "No mapped profile for '{model}' (mapped: {:?}) — using a generic Apple Silicon \
+         profile from prefix heuristics. Run the harness for a verified profiles/{model}.profile.",
+        Profile::bundled_models()
+    );
+    Profile::generic(&src.schema())
 }
 
 fn main() {
@@ -65,8 +64,8 @@ fn main() {
             std::process::exit(1);
         }
     };
-    let profile = load_profile();
-    eprintln!("hwtwin · model {} · {} rails, {} P-core sensors mapped",
+    let profile = load_profile(&src);
+    eprintln!("smcprobe · model {} · {} rails, {} P-core sensors mapped",
         profile.model, profile.rails.len(), profile.cpu_p_temp.len());
 
     match std::env::args().nth(1).as_deref() {
@@ -117,7 +116,7 @@ fn handle_conn(mut stream: TcpStream) {
             Ok(s) => s,
             Err(_) => return,
         };
-        let profile = load_profile();
+        let profile = load_profile(&src);
         loop {
             let msg = format!("data: {}\n\n", Snapshot::build(&src, &profile).to_json());
             if stream.write_all(msg.as_bytes()).is_err() || stream.flush().is_err() {

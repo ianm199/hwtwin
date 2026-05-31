@@ -4,7 +4,7 @@
 set -u
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-BIN="$HERE/target/release/smc_reader"
+BIN="$HERE/target/release/smcprobe"
 OUT="$HERE/smc_mapping"
 SAMPLES="$OUT/samples.jsonl"
 LOG="$OUT/run_gpu.log"
