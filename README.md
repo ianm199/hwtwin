@@ -60,31 +60,57 @@ Outputs land in [`smc_mapping/`](smc_mapping/): `schema.json`, `analysis.md/json
 `experiment_log.json` (the stimulus hypotheses). Raw `samples.jsonl` is regenerable and
 git-ignored.
 
-## Findings so far (Apple M3 Max)
+## Findings (Apple M3 Max, `Mac15,11`)
 
-- **CPU/SoC temps:** the `Tp*` family (96 keys) rises +20–30 °C specifically under CPU
-  load; `Te*` (10) tracks E-cores; `TCMb/TCMz` are the die hotspot.
-- **GPU temps:** the `Tg*` family (32 keys) rises +8–10 °C specifically under Metal load.
-- **DRAM:** `TRD*`; **SSD:** `TH0*` (specific to disk I/O).
-- **Power rails:** 46 rails expose voltage + current + power for the same suffix, and
-  **P = V × I holds live** — independent proof the decode is correct. Correlational
-  attribution: `C0x/C4x/E0b/SVR` → CPU/SoC, `C1x/C2x/b0f` → GPU, `C32/P2b/R*` → DRAM,
-  `R8b` → SSD.
-- **Counters:** 73 keys are monotonic free-running clocks (constant rate, not
-  load-coupled) — not energy meters; excluded from sensor analysis.
+| Subsystem | Keys | Stimulus that mapped it | Confidence |
+|---|---|---|---|
+| CPU P-cores | `Tp*` (96) | all-core compute | high |
+| CPU E-cores | `Te*` (10) | compute | medium |
+| GPU | `Tg*` (32) | Metal compute | high |
+| Die hotspot | `TCMb` `TCMz` | — | high |
+| DRAM temp / power | `TRD*` / `PMVC` | memory bandwidth | med-high |
+| SSD temp | `TH0*` | disk I/O | high |
+| **Power rails (46)** | `V/I/P<suffix>` | — | **high (P = V × I verified live)** |
+| Battery internals | `B*` (cells, charge, temps) | charger transitions | medium |
+| **AC adapter / charge input** | **`D3*`** (21; `D3V*`=voltage, `D3I*`=current), `AC*` | charger plug/unplug | high |
+| **Display backlight** | **`PDBR` / `IDBR`** | brightness min→max | high |
+| Neural Engine | shared `Ta0*`; faint candidates `Th00-02`/`Ts0h-i`/rail `C00` | CoreML conv on ANE | low — no dedicated sensor |
+
+Rail subsystem attribution (correlational): `C0x/C4x/E0b/SVR` → CPU/SoC, `C1x/C2x/b0f` → GPU,
+`C32/P2b/R*` → DRAM, `R8b` → SSD, `C00` → ANE-adjacent.
+
+**Two negative results worth recording:**
+- **73 `ui32` keys are free-running clocks** (constant rate, not load-coupled) — not energy meters; excluded from analysis.
+- **The `o*` family (358 keys) is static** — max delta `0.000` across *every* stimulus (compute, GPU, memory, disk, Wi-Fi, audio, charger, display, camera, ANE). They are not load-driven sensors but config/calibration/identity values; not crackable by stimulus-response.
 
 ### What's new here vs. existing tools
 
 Community tools (`exelban/stats`, VirtualSMC, archived key lists) document Intel keys
 well and ship a *sparse curated subset* of Apple Silicon temp keys — and **no Apple
-Silicon power/voltage/current rails at all**. This project's deltas:
+Silicon power/voltage/current rails, no adapter-input (`D3*`) map, and no backlight rail**.
+This project's deltas:
 
 1. A **Watt's-law-verified power-rail map** for Apple Silicon (undocumented elsewhere).
-2. **Full-family** temperature coverage with empirical per-stimulus attribution.
-3. A **reproducible method + dataset**, not hand-curated guesses.
+2. The **`D3*` AC-adapter / charge-input family** and the **`PDBR`/`IDBR` backlight rail**.
+3. **Full-family** temperature coverage with empirical per-stimulus attribution.
+4. A **reproducible method + dataset**, not hand-curated guesses.
 
-Findings will be contributed upstream (e.g. `exelban/stats#1703`, VirtualSMC) once the
-peripheral-stimulus sweep (`o*`/`D*` families) is complete.
+## Mapping a new Mac
+
+Run the harness on any Mac and it produces a `profiles/<hw.model>.profile`:
+
+```bash
+cargo build --release
+bash probe.sh            # CPU/E-core/memory/disk    bash probe_gpu.sh   # + GPU (Metal)
+bash probe_peripherals.sh # Wi-Fi/audio              bash simon.sh        # guided physical: charger/brightness/camera
+bash probe_ane.sh        # Neural Engine (needs ane-venv: python3.11 -m venv + pip install coremltools)
+python3 analyze.py smc_mapping     # ranked per-stimulus specificity
+python3 peripherals.py smc_mapping # low-signal, peripheral-specific pass
+python3 counters.py smc_mapping    # separate sensors from clocks
+```
+
+Then transcribe the confident keys into `profiles/<model>.profile` and the tool auto-loads
+it. Contributions of new-model profiles welcome.
 
 ## Quickstart
 
