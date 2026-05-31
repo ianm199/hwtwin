@@ -137,10 +137,29 @@ it. Contributions of new-model profiles welcome.
 ```bash
 cargo run --release -- serve     # live twin at http://127.0.0.1:8077
 cargo run --release              # terminal dashboard
+cargo run --release -- energy    # live CPU/GPU/ANE/DRAM watts (IOReport)
 cargo run --release -- scan      # dump all ~2,770 keys
 ```
 
-No dependencies — links Apple's IOKit/CoreFoundation frameworks directly.
+No external crates — links Apple's IOKit/CoreFoundation, and `dlopen`s the private
+IOReport library at runtime.
+
+## Energy meter (IOReport)
+
+The SMC gives *thermal* proxies; for *energy* the better source is **IOReport** — the
+private framework `powermetrics` reads. `smcprobe energy` subscribes to its "Energy Model"
+channel group, takes timed-delta samples, and prints **real per-subsystem watts**:
+
+```
+CPU  11.99  GPU   0.59  ANE  7.67  DRAM  3.95  DISP 0.15  │ total  24.35 W
+```
+
+The **`ANE` column is the payoff** — the Neural Engine is too power-efficient to register
+on the SMC's thermal sensors, but IOReport labels its energy directly: it reads ~0 W idle
+and jumps to ~8 W under a CoreML workload, so you can finally *see* whether a model is
+actually running on the Neural Engine. (IOReport is loaded via `dlopen` of
+`/usr/lib/libIOReport.dylib`; the rollup channels `CPU Energy`/`GPU Energy`/`ANE0`/`DRAM0`
+are used to avoid double-counting the per-core channels.)
 
 ## Architecture & Roadmap
 

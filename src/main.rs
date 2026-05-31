@@ -9,11 +9,13 @@
 //! Modes:
 //!   (no args)  live terminal dashboard, 1 Hz
 //!   serve      browser digital twin at http://127.0.0.1:8077
+//!   energy     live per-subsystem watts (CPU/GPU/ANE/DRAM) via IOReport
 //!   once       one dashboard frame, then exit
 //!   scan       dump every decodable key with its value and type
 //!   json       one JSON snapshot of all numeric keys (used by the probe harness)
 //!   schema     key -> type map (used by the probe harness)
 
+mod ioreport;
 mod model;
 mod profile;
 mod sensors;
@@ -57,6 +59,12 @@ fn load_profile(src: &dyn SensorSource) -> Profile {
 }
 
 fn main() {
+    // The energy meter uses IOReport, not the SMC — handle it before opening one.
+    if std::env::args().nth(1).as_deref() == Some("energy") {
+        ioreport::run_energy();
+        return;
+    }
+
     let src = match AppleSmc::open() {
         Ok(s) => s,
         Err(e) => {
