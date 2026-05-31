@@ -179,6 +179,16 @@ It answers questions time-profilers can't: *how many joules did this cost, and w
 they go.* (A CoreML inference loop, for instance, often shows up **CPU-bound** — the Python
 `predict()` overhead outweighs the ANE compute — even while real ANE energy is non-zero.)
 
+### Channel map
+
+`smcprobe ioreport` dumps the full IOReport namespace — **10,724 channels across 146 groups**
+on this M3 Max ([docs/ioreport-channels-Mac15,11.txt](docs/ioreport-channels-Mac15,11.txt)).
+It reaches far beyond the SMC: alongside `Energy Model`, it enumerates the whole coprocessor
+surface — `AOP` (always-on processor), `DCP` (display coprocessor), `H11ANE` (Neural Engine),
+`PMP0` (power management), `ANS2`/`NVMe` (SSD), `WLAN Power`, even the `SMC` itself — plus
+per-peripheral stats (battery, speaker, mic, trackpad, backlight). No comprehensive public
+map of this exists.
+
 ## Architecture & Roadmap
 
 The goal is a **simple, powerful, portable** tool: one static binary, an embedded UI, and

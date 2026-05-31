@@ -10,6 +10,8 @@
 //!   (no args)  live terminal dashboard, 1 Hz
 //!   serve      browser digital twin at http://127.0.0.1:8077
 //!   energy     live per-subsystem watts (CPU/GPU/ANE/DRAM) via IOReport
+//!   energy -- <cmd>   profile a command's energy by subsystem
+//!   ioreport   dump the IOReport channel map (group/subgroup/channel/unit)
 //!   once       one dashboard frame, then exit
 //!   scan       dump every decodable key with its value and type
 //!   json       one JSON snapshot of all numeric keys (used by the probe harness)
@@ -70,6 +72,10 @@ fn main() {
             }
         }
         ioreport::run_energy();
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("ioreport") {
+        ioreport::run_ioreport_list();
         return;
     }
 

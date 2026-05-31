@@ -41,8 +41,11 @@ type CreateSamplesFn = unsafe extern "C" fn(CFRef, CFMut, CFRef) -> CFRef;
 type CreateDeltaFn = unsafe extern "C" fn(CFRef, CFRef, CFRef) -> CFRef;
 type ChStrFn = unsafe extern "C" fn(CFRef) -> CFRef;
 type SimpleIntFn = unsafe extern "C" fn(CFRef, i32) -> i64;
+type CopyAllFn = unsafe extern "C" fn(u64, u64) -> CFMut;
 
-/// Resolved IOReport function pointers.
+/// Resolved IOReport function pointers. The last three are optional (used only
+/// by the `ioreport list` channel-map dump) so a missing one doesn't break the
+/// energy modes.
 struct IOReportApi {
     copy_channels: CopyChannelsFn,
     create_sub: CreateSubFn,
@@ -51,6 +54,9 @@ struct IOReportApi {
     channel_name: ChStrFn,
     unit_label: ChStrFn,
     simple_int: SimpleIntFn,
+    copy_all: Option<CopyAllFn>,
+    channel_group: Option<ChStrFn>,
+    channel_subgroup: Option<ChStrFn>,
 }
 
 impl IOReportApi {
@@ -74,6 +80,9 @@ impl IOReportApi {
                 channel_name: std::mem::transmute::<_, ChStrFn>(sym("IOReportChannelGetChannelName")?),
                 unit_label: std::mem::transmute::<_, ChStrFn>(sym("IOReportChannelGetUnitLabel")?),
                 simple_int: std::mem::transmute::<_, SimpleIntFn>(sym("IOReportSimpleGetIntegerValue")?),
+                copy_all: sym("IOReportCopyAllChannels").map(|p| std::mem::transmute::<_, CopyAllFn>(p)),
+                channel_group: sym("IOReportChannelGetGroup").map(|p| std::mem::transmute::<_, ChStrFn>(p)),
+                channel_subgroup: sym("IOReportChannelGetSubGroup").map(|p| std::mem::transmute::<_, ChStrFn>(p)),
             })
         }
     }
@@ -358,4 +367,82 @@ pub fn run_energy_profile(cmd: &[String]) {
         pct(total.cpu), pct(total.gpu), pct(total.ane), pct(total.dram), pct(total.disp)
     );
     println!("  → {verdict} ({label} {:.0}% of energy)", pct(share));
+}
+
+/// Dumps the IOReport channel namespace — group / subgroup / channel / unit,
+/// plus a 300 ms delta value — as a reference map. `smcprobe ioreport list`.
+pub fn run_ioreport_list() {
+    let api = match IOReportApi::load() {
+        Some(a) => a,
+        None => {
+            eprintln!("Could not load the IOReport framework.");
+            std::process::exit(1);
+        }
+    };
+    unsafe {
+        let chans = match api.copy_all {
+            Some(f) => f(0, 0),
+            None => {
+                let g = cfstr("Energy Model");
+                let c = (api.copy_channels)(g, std::ptr::null(), 0, 0, 0);
+                CFRelease(g);
+                c
+            }
+        };
+        if chans.is_null() {
+            eprintln!("No IOReport channels returned.");
+            std::process::exit(1);
+        }
+        let mut subbed: CFMut = std::ptr::null_mut();
+        let sub = (api.create_sub)(std::ptr::null(), chans, &mut subbed, 0, std::ptr::null());
+        if sub.is_null() {
+            eprintln!("IOReport subscription failed.");
+            std::process::exit(1);
+        }
+        let sc = if subbed.is_null() { chans } else { subbed };
+        let s1 = (api.create_samples)(sub, sc, std::ptr::null());
+        std::thread::sleep(Duration::from_millis(300));
+        let s2 = (api.create_samples)(sub, sc, std::ptr::null());
+        let delta = (api.create_delta)(s1, s2, std::ptr::null());
+
+        let key = cfstr("IOReportChannels");
+        let arr = CFDictionaryGetValue(delta, key);
+        CFRelease(key);
+        if arr.is_null() {
+            eprintln!("No channels in sample.");
+            std::process::exit(1);
+        }
+
+        let mut rows: Vec<(String, String, String, String, i64)> = Vec::new();
+        for i in 0..CFArrayGetCount(arr) {
+            let ch = CFArrayGetValueAtIndex(arr, i);
+            if ch.is_null() {
+                continue;
+            }
+            let group = api.channel_group.map(|f| to_string(f(ch))).unwrap_or_default();
+            let subgroup = api.channel_subgroup.map(|f| to_string(f(ch))).unwrap_or_default();
+            let name = to_string((api.channel_name)(ch));
+            let unit = to_string((api.unit_label)(ch));
+            let val = (api.simple_int)(ch, 0);
+            rows.push((group, subgroup, name, unit, val));
+        }
+        rows.sort_by(|a, b| a.0.cmp(&b.0).then(a.2.cmp(&b.2)));
+
+        println!("{:<24} {:<20} {:<28} {:<6} Δ(300ms)", "GROUP", "SUBGROUP", "CHANNEL", "UNIT");
+        for (g, s, n, u, v) in &rows {
+            // Simple-int reads non-simple (state/residency) channels as i64::MIN; blank those.
+            let vs = if *v == i64::MIN { "—".to_string() } else { v.to_string() };
+            println!("{g:<24} {s:<20} {n:<28} {u:<6} {vs}");
+        }
+
+        use std::collections::BTreeMap;
+        let mut counts: BTreeMap<&str, usize> = BTreeMap::new();
+        for (g, _, _, _, _) in &rows {
+            *counts.entry(g.as_str()).or_insert(0) += 1;
+        }
+        eprintln!("\n{} channels across {} groups:", rows.len(), counts.len());
+        for (g, c) in &counts {
+            eprintln!("  {g:<26} {c}");
+        }
+    }
 }
