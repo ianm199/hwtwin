@@ -4,3 +4,5 @@ gpu_stress
 .DS_Store
 smc_mapping/samples.jsonl
 smc_mapping/*.log
+ane-venv/
+ane_model.mlpackage/

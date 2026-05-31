@@ -33,4 +33,14 @@ adapter_current: D3IR D3MI
 backlight_power: PDBR
 backlight_current: IDBR
 
+# Neural Engine (ANE): no dedicated labeled SMC sensor exists — the ANE is so
+# power-efficient its thermal signature is faint. It IS monitored, via shared
+# SoC sensors (Ta0*) plus faint ANE-region-specific responders (low confidence):
+#   candidate temps: Th00 Th01 Th02 Ts0h Ts0i ; candidate rail: C00 (PC00/IC00)
+#
+# The o* family (~358 keys) is static: a max delta of 0.000 across every
+# stimulus (compute, gpu, memory, disk, wifi, audio, charger, display, camera,
+# ane). They are NOT load-driven sensors — config/calibration/identity values.
+# Not crackable by stimulus-response; would need value-matching or firmware RE.
+
 rails: C00 C01 C02 C03 C10 C11 C12 C13 C20 C21 C22 C23 C32 C40 C42 C43 E0b E1b P0b P1b P1l P2b P2l P3b P3l P4l P5b P5l P6b P7b P8b P9b R0b R0l R1b R1l R2b R3b R4b R5b R6b R7b R8b R9b SVR b0f
