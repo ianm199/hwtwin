@@ -1,6 +1,6 @@
 # SMC sensor mapping — correlational analysis
 
-Samples analyzed: 262  |  keys with deltas: 1915
+Samples analyzed: 351  |  keys with deltas: 1915
 
 
 ## Top responders to `cpu_all`
@@ -21,8 +21,8 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | Tp29 | flt | +29.67 | yes | CPU performance core |
 | Tp2A | flt | +29.67 | yes | CPU performance core |
 | PSVR | flt | +29.41 |  |  |
-| Tp2H | flt | +29.29 | yes | CPU performance core |
 | Tp2I | flt | +29.29 | yes | CPU performance core |
+| Tp2H | flt | +29.29 | yes | CPU performance core |
 | Tp3B | flt | +29.22 | yes | CPU performance core |
 | Tp3C | flt | +29.22 | yes | CPU performance core |
 | ftPk | flt | +29.06 | yes |  |
@@ -34,8 +34,8 @@ Samples analyzed: 262  |  keys with deltas: 1915
 |---|---|---|---|---|
 | B0AV | ui16 | +156.44 |  |  |
 | BC1V | ui16 | +85.33 |  |  |
-| BCMW | ui16 | +14.22 |  |  |
 | BC3V | ui16 | +14.22 |  |  |
+| BCMW | ui16 | +14.22 |  |  |
 | cmFs | flt | +14.00 | yes |  |
 | mlTJ | flt | +7.50 | yes |  |
 | voTp | flt | +6.39 | yes |  |
@@ -44,13 +44,13 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | mlTI | flt | +2.78 | yes |  |
 | xUPT | flt | +2.56 | yes |  |
 | voU0 | flt | +2.56 | yes |  |
-| voUp | flt | +2.56 | yes |  |
 | voUn | flt | +2.56 | yes |  |
+| voUp | flt | +2.56 | yes |  |
 | Tp1K | flt | +2.10 |  | CPU performance core |
 | ftP4 | flt | +1.82 |  |  |
 | Tp3W | flt | +1.66 |  | CPU performance core |
-| Tp1I | flt | +1.66 |  | CPU performance core |
 | Tp1J | flt | +1.66 |  | CPU performance core |
+| Tp1I | flt | +1.66 |  | CPU performance core |
 | Te06 | flt | +1.48 |  | CPU efficiency core |
 
 ## Top responders to `memory`
@@ -59,10 +59,10 @@ Samples analyzed: 262  |  keys with deltas: 1915
 |---|---|---|---|---|
 | B0AV | ui16 | +327.11 |  |  |
 | BC1V | ui16 | +170.67 |  |  |
-| BCMV | ui16 | +142.22 |  |  |
 | BC2V | ui16 | +142.22 |  |  |
-| BCMW | ui16 | +85.33 |  |  |
+| BCMV | ui16 | +142.22 |  |  |
 | BC3V | ui16 | +85.33 |  |  |
+| BCMW | ui16 | +85.33 |  |  |
 | mlS2 | flt | +25.78 | yes |  |
 | xDPE | flt | +17.52 |  |  |
 | si05 | flt | +16.17 |  |  |
@@ -83,11 +83,11 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | key | type | Δ°/ΔW | specific | name-prefix hint |
 |---|---|---|---|---|
 | B0AV | ui16 | +327.11 |  |  |
-| BCMV | ui16 | +227.56 |  |  |
 | BC2V | ui16 | +227.56 |  |  |
+| BCMV | ui16 | +227.56 |  |  |
 | BC1V | ui16 | +156.44 |  |  |
-| BCMW | ui16 | +71.11 |  |  |
 | BC3V | ui16 | +71.11 |  |  |
+| BCMW | ui16 | +71.11 |  |  |
 | mlS2 | flt | +8.67 |  |  |
 | PSTR | flt | +6.59 |  | system total power |
 | fpC0 | flt | +6.00 |  |  |
@@ -109,7 +109,7 @@ Samples analyzed: 262  |  keys with deltas: 1915
 |---|---|---|---|---|
 | B0NC | ui16 | +11206.83 | yes |  |
 | B0TE | ui16 | +3125.11 | yes |  |
-| B1AT | ui16 | +156.44 | yes |  |
+| B1AT | ui16 | +156.44 |  |  |
 | F1Ac | flt | +100.69 |  |  |
 | F1Tg | flt | +88.28 |  |  |
 | F0Ac | flt | +83.89 |  |  |
@@ -119,14 +119,69 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | rtF0 | flt | +82.30 |  |  |
 | mxFR | flt | +82.18 |  |  |
 | F0Tg | flt | +81.61 |  |  |
-| B0AT | ui16 | +71.11 | yes |  |
-| B2AT | ui16 | +71.11 | yes |  |
+| B2AT | ui16 | +71.11 |  |  |
+| B0AT | ui16 | +71.11 |  |  |
 | PSVR | flt | +20.09 |  |  |
 | PSTR | flt | +18.45 |  | system total power |
 | xDPE | flt | +16.23 |  |  |
 | PHPC | flt | +15.92 |  |  |
 | si10 | flt | +15.92 |  |  |
 | fdS0 | flt | +15.04 |  |  |
+
+## Top responders to `wifi`
+
+| key | type | Δ°/ΔW | specific | name-prefix hint |
+|---|---|---|---|---|
+| B0AV | ui16 | +6186.60 |  |  |
+| BC2V | ui16 | +960.00 | yes |  |
+| BCMV | ui16 | +730.67 | yes |  |
+| BC3V | ui16 | +704.00 | yes |  |
+| BCMW | ui16 | +645.33 | yes |  |
+| BC1V | ui16 | +528.00 | yes |  |
+| B2AT | ui16 | +165.33 | yes |  |
+| B0AT | ui16 | +165.33 | yes |  |
+| B1AT | ui16 | +144.00 |  |  |
+| F1Ac | flt | +64.62 |  |  |
+| B0NC | ui16 | +58.67 |  |  |
+| BFC1 | ui16 | +58.67 | yes |  |
+| B0FC | ui16 | +58.67 | yes |  |
+| BFC2 | ui16 | +58.67 | yes |  |
+| F1Tg | flt | +56.42 |  |  |
+| fc0T | flt | +52.62 |  |  |
+| F0Tg | flt | +52.40 |  |  |
+| voF0 | flt | +52.15 |  |  |
+| rtF0 | flt | +52.10 |  |  |
+| mxFR | flt | +51.97 |  |  |
+
+## Top responders to `audio`
+
+| key | type | Δ°/ΔW | specific | name-prefix hint |
+|---|---|---|---|---|
+| B1AT | ui16 | +154.67 |  |  |
+| B0TF | ui16 | +69.33 | yes |  |
+| si10 | flt | +8.66 |  |  |
+| PHPC | flt | +7.54 |  |  |
+| SBAR | flt | +7.15 |  |  |
+| B0RM | ui16 | +7.00 |  |  |
+| mxT0 | flt | +6.46 |  |  |
+| mlT2 | flt | +6.46 | yes |  |
+| voTl | flt | +6.46 |  |  |
+| voTn | flt | +6.46 |  |  |
+| voTs | flt | +6.46 | yes |  |
+| fph0 | flt | +3.66 |  |  |
+| SBAP | flt | +2.41 |  |  |
+| fph1 | flt | +2.30 |  |  |
+| SAQw | ui16 | +2.21 |  |  |
+| SARw | ui16 | +2.21 |  |  |
+| Tp3B | flt | +2.05 |  | CPU performance core |
+| Tp3C | flt | +2.05 |  | CPU performance core |
+| ftPk | flt | +2.05 |  |  |
+| mlS2 | flt | +2.00 |  |  |
+
+## Top responders to `display`
+
+| key | type | Δ°/ΔW | specific | name-prefix hint |
+|---|---|---|---|---|
 
 ## Stimulus-specific keys (strongest single-stimulus response)
 
@@ -135,16 +190,24 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | B0AV | ui16 | cpu_all | +25727.50 |  |
 | B0NC | ui16 | gpu | +11206.83 |  |
 | B0TE | ui16 | gpu | +3125.11 |  |
+| BC2V | ui16 | wifi | +960.00 |  |
+| BCMV | ui16 | wifi | +730.67 |  |
+| BC3V | ui16 | wifi | +704.00 |  |
+| BCMW | ui16 | wifi | +645.33 |  |
 | voF0 | flt | cpu_all | +528.60 |  |
+| BC1V | ui16 | wifi | +528.00 |  |
 | mxF0 | flt | cpu_all | +503.36 |  |
 | rtF0 | flt | cpu_all | +179.92 |  |
-| B1AT | ui16 | gpu | +156.44 |  |
-| B0AT | ui16 | gpu | +71.11 |  |
-| B2AT | ui16 | gpu | +71.11 |  |
+| B2AT | ui16 | wifi | +165.33 |  |
+| B0AT | ui16 | wifi | +165.33 |  |
+| B0TF | ui16 | audio | +69.33 |  |
+| BFC1 | ui16 | wifi | +58.67 |  |
+| B0FC | ui16 | wifi | +58.67 |  |
+| BFC2 | ui16 | wifi | +58.67 |  |
 | Tp29 | flt | cpu_all | +29.67 | CPU performance core |
 | Tp2A | flt | cpu_all | +29.67 | CPU performance core |
-| Tp2H | flt | cpu_all | +29.29 | CPU performance core |
 | Tp2I | flt | cpu_all | +29.29 | CPU performance core |
+| Tp2H | flt | cpu_all | +29.29 | CPU performance core |
 | Tp3B | flt | cpu_all | +29.22 | CPU performance core |
 | Tp3C | flt | cpu_all | +29.22 | CPU performance core |
 | ftPk | flt | cpu_all | +29.06 |  |
@@ -170,18 +233,18 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | Tp0b | flt | cpu_all | +25.51 | CPU performance core |
 | SBAR | flt | cpu_all | +25.50 |  |
 | ftP2 | flt | cpu_all | +25.41 |  |
-| Tp2P | flt | cpu_all | +25.36 | CPU performance core |
 | Tp2Q | flt | cpu_all | +25.36 | CPU performance core |
+| Tp2P | flt | cpu_all | +25.36 | CPU performance core |
 | TVD0 | flt | cpu_all | +24.44 |  |
 | TCMb | flt | cpu_all | +24.44 | CPU die hotspot |
-| Tp1g | flt | cpu_all | +23.26 | CPU performance core |
 | Tp1h | flt | cpu_all | +23.26 | CPU performance core |
+| Tp1g | flt | cpu_all | +23.26 | CPU performance core |
 | ftPf | flt | cpu_all | +22.78 |  |
 | ftPl | flt | cpu_all | +22.73 |  |
-| Tp2z | flt | cpu_all | +22.66 | CPU performance core |
 | Tp30 | flt | cpu_all | +22.66 | CPU performance core |
-| Tp1I | flt | cpu_all | +22.49 | CPU performance core |
+| Tp2z | flt | cpu_all | +22.66 | CPU performance core |
 | Tp1J | flt | cpu_all | +22.49 | CPU performance core |
+| Tp1I | flt | cpu_all | +22.49 | CPU performance core |
 | ftP4 | flt | cpu_all | +22.37 |  |
 | ftPj | flt | cpu_all | +21.89 |  |
 | Tp0g | flt | cpu_all | +21.62 | CPU performance core |
@@ -196,8 +259,8 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | Tp1y | flt | cpu_all | +21.43 | CPU performance core |
 | Tp2s | flt | cpu_all | +21.13 | CPU performance core |
 | Tp2r | flt | cpu_all | +21.13 | CPU performance core |
-| Tp1F | flt | cpu_all | +21.02 | CPU performance core |
 | Tp1E | flt | cpu_all | +21.02 | CPU performance core |
+| Tp1F | flt | cpu_all | +21.02 | CPU performance core |
 | ftP7 | flt | cpu_all | +20.91 |  |
 | Tp3j | flt | cpu_all | +20.82 | CPU performance core |
 | ftPh | flt | cpu_all | +20.50 |  |
@@ -208,15 +271,15 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | ftD0 | flt | cpu_all | +20.11 |  |
 | Tp3b | flt | cpu_all | +20.04 | CPU performance core |
 | Tp0W | flt | cpu_all | +19.32 | CPU performance core |
-| Tp0C | flt | cpu_all | +19.22 | CPU performance core |
 | Tp0D | flt | cpu_all | +19.22 | CPU performance core |
+| Tp0C | flt | cpu_all | +19.22 | CPU performance core |
 | ftP3 | flt | cpu_all | +19.12 |  |
 | Tp3P | flt | cpu_all | +18.88 | CPU performance core |
-| Tp17 | flt | cpu_all | +18.80 | CPU performance core |
 | Tp16 | flt | cpu_all | +18.80 | CPU performance core |
+| Tp17 | flt | cpu_all | +18.80 | CPU performance core |
 | ftP5 | flt | cpu_all | +18.72 |  |
-| Tp0L | flt | cpu_all | +18.71 | CPU performance core |
 | Tp0K | flt | cpu_all | +18.71 | CPU performance core |
+| Tp0L | flt | cpu_all | +18.71 | CPU performance core |
 | Tp0c | flt | cpu_all | +18.68 | CPU performance core |
 | ftP9 | flt | cpu_all | +18.66 |  |
 | Tp3X | flt | cpu_all | +18.57 | CPU performance core |
@@ -235,18 +298,18 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | Tp0M | flt | cpu_all | +15.19 | CPU performance core |
 | Tp0E | flt | cpu_all | +15.18 | CPU performance core |
 | Tf4B | flt | cpu_all | +14.82 |  |
-| Tf4D | flt | cpu_all | +14.74 |  |
-| Tf44 | flt | cpu_all | +14.74 |  |
 | Tf4E | flt | cpu_all | +14.74 |  |
+| Tf44 | flt | cpu_all | +14.74 |  |
+| Tf4D | flt | cpu_all | +14.74 |  |
 | Tf09 | flt | cpu_all | +14.64 |  |
 | Tp26 | flt | cpu_all | +14.49 | CPU performance core |
 | Tp25 | flt | cpu_all | +14.49 | CPU performance core |
 | Tp1K | flt | cpu_all | +14.49 | CPU performance core |
 | Tf49 | flt | cpu_all | +14.47 |  |
 | Tp18 | flt | cpu_all | +14.40 | CPU performance core |
-| Tf0E | flt | cpu_all | +14.27 |  |
 | Tf04 | flt | cpu_all | +14.27 |  |
 | Tf0D | flt | cpu_all | +14.27 |  |
+| Tf0E | flt | cpu_all | +14.27 |  |
 | ftPp | flt | cpu_all | +14.11 |  |
 | Tf0B | flt | cpu_all | +14.11 |  |
 | cmFs | flt | cpu_e | +14.00 |  |
@@ -256,8 +319,8 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | Tp0R | flt | cpu_all | +13.59 | CPU performance core |
 | TCDX | flt | cpu_all | +13.51 |  |
 | ftPb | flt | cpu_all | +13.48 |  |
-| SARw | ui16 | cpu_all | +13.44 |  |
 | SAQw | ui16 | cpu_all | +13.44 |  |
+| SARw | ui16 | cpu_all | +13.44 |  |
 | ftPo | flt | cpu_all | +13.42 |  |
 | Tp0m | flt | cpu_all | +13.16 | CPU performance core |
 | Tp0n | flt | cpu_all | +13.16 | CPU performance core |
@@ -279,8 +342,8 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | Tp2j | flt | cpu_all | +11.97 | CPU performance core |
 | ftPq | flt | cpu_all | +11.91 |  |
 | TVV0 | flt | cpu_all | +11.82 |  |
-| Tp2g | flt | cpu_all | +11.81 | CPU performance core |
 | Tp2f | flt | cpu_all | +11.81 | CPU performance core |
+| Tp2g | flt | cpu_all | +11.81 | CPU performance core |
 | PC42 | flt | cpu_all | +11.28 |  |
 | Tf4A | flt | cpu_all | +11.21 |  |
 | Ts05 | flt | cpu_all | +11.19 |  |
@@ -296,8 +359,8 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | ftD1 | flt | cpu_all | +10.47 |  |
 | Th06 | flt | cpu_all | +10.43 |  |
 | ftG4 | flt | gpu | +10.31 |  |
-| Tg2I | flt | gpu | +10.26 | GPU |
 | Tg2H | flt | gpu | +10.26 | GPU |
+| Tg2I | flt | gpu | +10.26 | GPU |
 | PC02 | flt | cpu_all | +10.00 |  |
 | isUR | flt | cpu_all | +9.49 |  |
 | cePa | flt | cpu_all | +9.40 |  |
@@ -305,8 +368,8 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | Tf08 | flt | cpu_all | +9.38 |  |
 | Tg33 | flt | gpu | +9.34 | GPU |
 | Tg34 | flt | gpu | +9.34 | GPU |
-| Tg3B | flt | gpu | +9.34 | GPU |
 | Tg3C | flt | gpu | +9.34 | GPU |
+| Tg3B | flt | gpu | +9.34 | GPU |
 | Tg29 | flt | gpu | +9.25 | GPU |
 | Tg2A | flt | gpu | +9.25 | GPU |
 | Tf2B | flt | gpu | +9.22 |  |
@@ -314,10 +377,10 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | Tg05 | flt | gpu | +9.14 | GPU |
 | Tg04 | flt | gpu | +9.14 | GPU |
 | ftG6 | flt | gpu | +8.86 |  |
-| Tg3J | flt | gpu | +8.81 | GPU |
 | Tg3K | flt | gpu | +8.81 | GPU |
-| Tf24 | flt | gpu | +8.81 |  |
+| Tg3J | flt | gpu | +8.81 | GPU |
 | Tf2D | flt | gpu | +8.81 |  |
+| Tf24 | flt | gpu | +8.81 |  |
 | Tf2E | flt | gpu | +8.81 |  |
 | SBAP | flt | gpu | +8.73 |  |
 | Tf1B | flt | gpu | +8.70 |  |
@@ -327,19 +390,19 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | Tg0C | flt | gpu | +8.46 | GPU |
 | ftG2 | flt | gpu | +8.41 |  |
 | Tf29 | flt | gpu | +8.38 |  |
-| Tg0z | flt | gpu | +8.34 | GPU |
 | Tg0y | flt | gpu | +8.34 | GPU |
-| Tg0K | flt | gpu | +8.34 | GPU |
+| Tg0z | flt | gpu | +8.34 | GPU |
 | Tg0L | flt | gpu | +8.34 | GPU |
+| Tg0K | flt | gpu | +8.34 | GPU |
+| Tf14 | flt | gpu | +8.33 |  |
 | Tf1E | flt | gpu | +8.33 |  |
 | Tf1D | flt | gpu | +8.33 |  |
-| Tf14 | flt | gpu | +8.33 |  |
 | Tf18 | flt | gpu | +8.31 |  |
 | ftD2 | flt | cpu_all | +8.19 |  |
 | Tf19 | flt | gpu | +8.18 |  |
 | Tf28 | flt | gpu | +8.07 |  |
-| Tg16 | flt | gpu | +7.97 | GPU |
 | Tg17 | flt | gpu | +7.97 | GPU |
+| Tg16 | flt | gpu | +7.97 | GPU |
 | Tg1E | flt | gpu | +7.96 | GPU |
 | Tg1F | flt | gpu | +7.96 | GPU |
 | ftG3 | flt | gpu | +7.66 |  |
@@ -353,6 +416,8 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | Tg3x | flt | gpu | +7.18 | GPU |
 | ftDa | flt | cpu_all | +6.97 |  |
 | isPa | flt | cpu_all | +6.78 |  |
+| mlT2 | flt | audio | +6.46 |  |
+| voTs | flt | audio | +6.46 |  |
 | voTp | flt | cpu_e | +6.39 |  |
 | mlTK | flt | cpu_e | +6.39 |  |
 | Tg1x | flt | gpu | +6.16 | GPU |
@@ -365,7 +430,6 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | TH0b | flt | disk | +5.25 | NAND / storage |
 | IC12 | flt | gpu | +4.93 |  |
 | ftz0 | flt | memory | +4.91 |  |
-| vou0 | flt | gpu | +4.81 |  |
 | IC20 | flt | gpu | +4.80 |  |
 | IC10 | flt | gpu | +4.59 |  |
 | PC12 | flt | gpu | +4.53 |  |
@@ -376,9 +440,6 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | PC22 | flt | gpu | +4.12 |  |
 | TRD0 | flt | memory | +3.52 |  |
 | isFa | flt | cpu_all | +3.50 |  |
-| mxT0 | flt | cpu_all | +3.33 |  |
-| voTl | flt | cpu_all | +3.33 |  |
-| voTn | flt | cpu_all | +3.33 |  |
 | TRD2 | flt | memory | +3.28 |  |
 | PPSC | flt | memory | +3.22 |  |
 | TRD9 | flt | memory | +3.21 |  |
@@ -393,12 +454,12 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | TRDd | flt | memory | +2.68 |  |
 | ffH0 | flt | memory | +2.64 |  |
 | TRD5 | flt | memory | +2.60 |  |
-| feFs | flt | memory | +2.60 |  |
 | meFs | flt | memory | +2.60 |  |
+| feFs | flt | memory | +2.60 |  |
 | xUPT | flt | cpu_e | +2.56 |  |
 | voU0 | flt | cpu_e | +2.56 |  |
-| voUp | flt | cpu_e | +2.56 |  |
 | voUn | flt | cpu_e | +2.56 |  |
+| voUp | flt | cpu_e | +2.56 |  |
 | TRD6 | flt | memory | +2.48 |  |
 | ftN0 | flt | disk | +2.44 |  |
 | TRD3 | flt | memory | +2.42 |  |
@@ -419,8 +480,6 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | iaPm | flt | memory | +1.85 |  |
 | mlM0 | flt | memory | +1.85 |  |
 | TPD3 | flt | memory | +1.82 | CPU performance core die |
-| mlT2 | flt | cpu_all | +1.67 |  |
-| voTs | flt | cpu_all | +1.67 |  |
 | TPDc | flt | memory | +1.58 | CPU performance core die |
 | TPDa | flt | memory | +1.58 | CPU performance core die |
 | Ib8f | flt | gpu | +1.57 |  |
@@ -452,9 +511,9 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | I00A | flt | gpu | +1.03 |  |
 | TVMO | flt | memory | +1.01 |  |
 | I00B | flt | gpu | +0.89 |  |
-| ceF2 | flt | gpu | +0.89 |  |
 | IPSC | flt | memory | +0.86 |  |
 | TCHP | flt | memory | +0.82 |  |
+| msP0 | flt | audio | +0.76 |  |
 | ft07 | flt | gpu | +0.71 |  |
 | VC22 | flt | gpu | +0.70 |  |
 | VC23 | flt | gpu | +0.70 |  |
@@ -463,12 +522,12 @@ Samples analyzed: 262  |  keys with deltas: 1915
 | IPBR | flt | gpu | +0.69 |  |
 | Ib0f | flt | gpu | +0.69 |  |
 | SBAC | flt | gpu | +0.69 |  |
-| uuO2 | flt | cpu_all | +0.67 |  |
-| iaP0 | flt | cpu_all | +0.67 |  |
-| iaP1 | flt | cpu_all | +0.67 |  |
-| uuO1 | flt | cpu_all | +0.67 |  |
 | iaP2 | flt | cpu_all | +0.67 |  |
+| iaP0 | flt | cpu_all | +0.67 |  |
+| uuO2 | flt | cpu_all | +0.67 |  |
+| uuO1 | flt | cpu_all | +0.67 |  |
 | uuO0 | flt | cpu_all | +0.67 |  |
+| iaP1 | flt | cpu_all | +0.67 |  |
 | VC20 | flt | gpu | +0.66 |  |
 | f006 | flt | disk | +0.66 |  |
 | PR8b | flt | disk | +0.64 |  |
