@@ -2,7 +2,7 @@
 
 I mapped the M3 Max (`Mac15,11`) SMC keys empirically and figured the data might help here.
 
-Rather than guess from names, I drove **isolated workloads** (all-core CPU, Metal GPU, memory bandwidth, disk I/O, plus charger/brightness physical steps) while sampling every numeric key, and kept the keys that respond *specifically* to one subsystem. It's the thermal-correlation approach `iSMC`'s `guess` uses, taken across the full key set. Method, raw dataset, and a reproducible harness are here: **[link to repo]**.
+Rather than guess from names, I drove **isolated workloads** (all-core CPU, Metal GPU, memory bandwidth, disk I/O, plus charger/brightness physical steps) while sampling every numeric key, and kept the keys that respond *specifically* to one subsystem. It's the thermal-correlation approach `iSMC`'s `guess` uses, taken across the full key set. Method, raw dataset, and a reproducible harness are here: https://github.com/ianm199/hwtwin.
 
 **Temperature families (the part most relevant to this issue):**
 
